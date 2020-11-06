@@ -6,6 +6,7 @@ using Robust.Shared.Timing;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Prometheus;
 
 namespace Robust.Analyzer
 {
@@ -21,6 +22,7 @@ namespace Robust.Analyzer
         public IComponentManager ComponentManager => throw new NotImplementedException();
 
         public IEntityNetworkManager EntityNetManager => throw new NotImplementedException();
+        public IEntitySystemManager EntitySysManager => throw new NotImplementedException();
 
         public IEventBus EventBus => throw new NotImplementedException();
 
@@ -34,12 +36,17 @@ namespace Robust.Analyzer
             throw new NotImplementedException();
         }
 
-        public IEntity CreateEntityUninitialized(string prototypeName, GridCoordinates coordinates)
+        public IEntity CreateEntityUninitialized(string prototypeName, EntityCoordinates coordinates)
         {
             throw new NotImplementedException();
         }
 
         public IEntity CreateEntityUninitialized(string prototypeName, MapCoordinates coordinates)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<IEntity> GetEntitiesInMap(MapId mapId)
         {
             throw new NotImplementedException();
         }
@@ -55,6 +62,11 @@ namespace Robust.Analyzer
         }
 
         public bool EntityExists(EntityUid uid)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Update(float frameTime, Histogram? histogram = null)
         {
             throw new NotImplementedException();
         }
@@ -79,17 +91,22 @@ namespace Robust.Analyzer
             throw new NotImplementedException();
         }
 
-        public IEnumerable<IEntity> GetEntitiesInArc(GridCoordinates coordinates, float range, Angle direction, float arcWidth, bool approximate = false)
+        public IEnumerable<IEntity> GetEntitiesInArc(EntityCoordinates coordinates, float range, Angle direction, float arcWidth, bool approximate = false)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<IEntity> GetEntitiesInRange(GridCoordinates position, float range, bool approximate = false)
+        public IEnumerable<IEntity> GetEntitiesInRange(EntityCoordinates position, float range, bool approximate = false)
         {
             throw new NotImplementedException();
         }
 
         public IEnumerable<IEntity> GetEntitiesInRange(IEntity entity, float range, bool approximate = false)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsIntersecting(IEntity entityOne, IEntity entityTwo)
         {
             throw new NotImplementedException();
         }
@@ -114,7 +131,7 @@ namespace Robust.Analyzer
             throw new NotImplementedException();
         }
 
-        public IEnumerable<IEntity> GetEntitiesIntersecting(GridCoordinates position, bool approximate = false)
+        public IEnumerable<IEntity> GetEntitiesIntersecting(EntityCoordinates position, bool approximate = false)
         {
             throw new NotImplementedException();
         }
@@ -144,7 +161,7 @@ namespace Robust.Analyzer
             throw new NotImplementedException();
         }
 
-        public IEntity SpawnEntity(string protoName, GridCoordinates coordinates)
+        public IEntity SpawnEntity(string protoName, EntityCoordinates coordinates)
         {
             throw new NotImplementedException();
         }
@@ -154,7 +171,7 @@ namespace Robust.Analyzer
             throw new NotImplementedException();
         }
 
-        public IEntity SpawnEntityNoMapInit(string protoName, GridCoordinates coordinates)
+        public IEntity SpawnEntityNoMapInit(string protoName, EntityCoordinates coordinates)
         {
             throw new NotImplementedException();
         }
