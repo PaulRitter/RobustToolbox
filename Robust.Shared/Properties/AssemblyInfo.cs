@@ -10,3 +10,4 @@
 [assembly: InternalsVisibleTo("OpenToolkit.GraphicsLibraryFramework")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")] // Gives access to Castle(Moq)
 [assembly: InternalsVisibleTo("Content.Benchmarks")]
+[assembly: InternalsVisibleTo("Robust.Analyzer")]

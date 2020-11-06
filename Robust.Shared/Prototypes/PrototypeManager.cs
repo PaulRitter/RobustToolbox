@@ -54,6 +54,15 @@ namespace Robust.Shared.Prototypes
         bool HasIndex<T>(string id) where T : IIndexedPrototype;
         bool TryIndex<T>(string id, out T prototype) where T : IIndexedPrototype;
         /// <summary>
+        /// Index for a <see cref="IIndexedPrototype"/> by ID,  refering to the prototype type by a string.
+        /// </summary>
+        /// <exception cref="KeyNotFoundException">
+        /// Thrown if the ID does not exist or the type of prototype is not registered.
+        /// </exception>
+        IIndexedPrototype Index(string prototypeType, string id);
+        bool HasIndex(string prototypeType, string id);
+        bool TryIndex(string prototypeType, string id, out IIndexedPrototype prototype);
+        /// <summary>
         /// Load prototypes from files in a directory, recursively.
         /// </summary>
         void LoadDirectory(ResourcePath path);
@@ -157,6 +166,15 @@ namespace Robust.Shared.Prototypes
                 throw new InvalidOperationException("No prototypes have been loaded yet.");
             }
             return indexedPrototypes[type][id];
+        }
+
+        public IIndexedPrototype Index(string prototypeType, string id)
+        {
+            if (!_hasEverBeenReloaded)
+            {
+                throw new InvalidOperationException("No prototypes have been loaded yet.");
+            }
+            return indexedPrototypes[prototypeTypes[prototypeType]][id];
         }
 
         public void Clear()
@@ -342,6 +360,32 @@ namespace Robust.Shared.Prototypes
             var returned = index.TryGetValue(id, out var uncast);
             prototype = (T) uncast!;
             return returned;
+        }
+
+        public bool HasIndex(string prototypeType, string id)
+        {
+            if (!prototypeTypes.TryGetValue(prototypeType, out var type))
+            {
+                throw new UnknownPrototypeException(id);
+            }
+            if (!indexedPrototypes.TryGetValue(type, out var index))
+            {
+                throw new UnknownPrototypeException(id);
+            }
+            return index.ContainsKey(id);
+        }
+
+        public bool TryIndex(string prototypeType, string id, out IIndexedPrototype prototype)
+        {
+            if (!prototypeTypes.TryGetValue(prototypeType, out var type))
+            {
+                throw new UnknownPrototypeException(id);
+            }
+            if (!indexedPrototypes.TryGetValue(type, out var index))
+            {
+                throw new UnknownPrototypeException(id);
+            }
+            return index.TryGetValue(id, out prototype);
         }
 
         public void RegisterIgnore(string name)
