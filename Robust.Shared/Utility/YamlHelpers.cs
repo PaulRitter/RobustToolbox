@@ -6,6 +6,7 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using Robust.Shared.Log;
 using YamlDotNet.RepresentationModel;
 
 namespace Robust.Shared.Utility
@@ -152,6 +153,7 @@ namespace Robust.Shared.Utility
         [Pure]
         public static T GetNode<T>(this YamlMappingNode mapping, string key) where T : YamlNode
         {
+            mapping.NodeConsumed(key);
             return (T) mapping[_getFetchNode(key)];
         }
 
@@ -186,6 +188,7 @@ namespace Robust.Shared.Utility
         [Pure]
         public static bool TryGetNode<T>(this YamlMappingNode mapping, string key, [NotNullWhen(true)] out T? returnNode) where T : YamlNode
         {
+            mapping.NodeConsumed(key);
             if (mapping.Children.TryGetValue(_getFetchNode(key), out var node))
             {
                 returnNode = (T) node;
@@ -207,6 +210,7 @@ namespace Robust.Shared.Utility
         /// <returns>True if the value could be found, false otherwise.</returns>
         public static bool TryGetNode(this YamlMappingNode mapping, string key, [NotNullWhen(true)] out YamlNode? returnNode)
         {
+            mapping.NodeConsumed(key);
             return mapping.Children.TryGetValue(_getFetchNode(key), out returnNode);
         }
 
@@ -216,15 +220,29 @@ namespace Robust.Shared.Utility
             return mapping.TryGetNode(key, out var _);
         }
 
-        /// <summary>
-        /// Copies a <see cref="YamlMappingNode" /> to a dictionary by using scalar values as keys for the dictionary.
-        /// </summary>
-        /// <param name="mapping">The mapping to copy from.</param>
-        /// <returns>The dictionary.</returns>
-        [Pure]
-        public static Dictionary<string, YamlNode> YamlMappingToDict(YamlMappingNode mapping)
+        private static Dictionary<YamlMappingNode, List<string>> _consumedNodes = new Dictionary<YamlMappingNode, List<string>>();
+
+        private static void NodeConsumed(this YamlMappingNode mapping, string id)
         {
-            return mapping.ToDictionary(p => p.Key.AsString(), p => p.Value);
+            if(!_consumedNodes.ContainsKey(mapping)) _consumedNodes[mapping] = new List<string>();
+
+            _consumedNodes[mapping].Add(id);
+        }
+
+        public static List<string> TakeUnconsumedNodes(this YamlMappingNode mapping)
+        {
+            List<string> unconsumedNodes = new List<string>();
+            var nodes = _consumedNodes[mapping];
+            _consumedNodes.Remove(mapping);
+            foreach (var (key, value) in mapping.Children)
+            {
+                if (!nodes.Contains(key.ToString()))
+                {
+                    unconsumedNodes.Add(key.ToString());
+                }
+            }
+
+            return unconsumedNodes;
         }
 
         private static YamlScalarNode _getFetchNode(string key)

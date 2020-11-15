@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore.Internal;
 using Robust.Shared.Asynchronous;
 using Robust.Shared.Interfaces.Reflection;
 using Robust.Shared.Interfaces.Resources;
@@ -310,6 +311,7 @@ namespace Robust.Shared.Prototypes
                 var prototypeType = prototypeTypes[type];
                 var prototype = _dynamicTypeFactory.CreateInstance<IPrototype>(prototypeType);
                 prototype.LoadFrom(node);
+                var unconsumedNodes = node.TakeUnconsumedNodes();
                 prototypes[prototypeType].Add(prototype);
                 var indexedPrototype = prototype as IIndexedPrototype;
                 if (indexedPrototype != null)
@@ -320,6 +322,13 @@ namespace Robust.Shared.Prototypes
                         throw new PrototypeLoadException(string.Format("Duplicate ID: '{0}'", id));
                     }
                     indexedPrototypes[prototypeType][id] = (IIndexedPrototype)prototype;
+                    if(unconsumedNodes.Count != 0)
+                        Logger.Error($"Consumptionerror in indexed prototype {id}\n- {unconsumedNodes.Join("\n- ")}");
+                }
+                else
+                {
+                    if(unconsumedNodes.Count != 0)
+                        Logger.Error($"Consumptionerror in prototype {type}\n- {unconsumedNodes.Join("\n- ")}");
                 }
             }
         }
